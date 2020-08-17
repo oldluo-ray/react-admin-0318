@@ -3,7 +3,7 @@ import { Button, Table, Tooltip } from 'antd'
 import { PlusOutlined, FormOutlined, DeleteOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 
-import { getSubjectList } from './redux'
+import { getSubjectList, getSecSubjectList } from './redux'
 
 import './index.less'
 
@@ -82,7 +82,7 @@ const data = [
 // 使用高阶组件时,如果用修饰器语法: 传入展示组件的调用可以不写了
 @connect(
   state => ({ subjectList: state.subjectList }),
-  { getSubjectList }
+  { getSubjectList, getSecSubjectList }
 )
 class Subject extends Component {
   // constructor() {
@@ -119,6 +119,8 @@ class Subject extends Component {
     //如果是展开,就发送请求获取二级菜单数据
     if (expanded) {
       //发送请求,获取二级菜单数据
+      // 一级课程的_id是二级课程的parentId
+      this.props.getSecSubjectList(record._id)
     }
   }
 
