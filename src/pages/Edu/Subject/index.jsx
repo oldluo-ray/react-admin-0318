@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import { Button, Table, Tooltip } from 'antd'
 import { PlusOutlined, FormOutlined, DeleteOutlined } from '@ant-design/icons'
+import { connect } from 'react-redux'
+
+import { getSubjectList } from './redux'
 
 import './index.less'
 
@@ -10,7 +13,8 @@ const columns = [
    * dataIndex: 表示这一列中要展示data数据的中哪一项值
    * key: 唯一id
    */
-  { title: '分类名称', dataIndex: 'name', key: 'name' },
+  // 注意: 后台返回的数据,课程分类名称的属性是title.不是name.所以记得改一下
+  { title: '分类名称', dataIndex: 'title', key: 'name' },
   {
     title: '操作',
     // 注意: 如果这一列不展示data中的数据,那么就可以不写dataIndex,或者是值为空的字符串
@@ -75,8 +79,19 @@ const data = [
   }
 ]
 
-export default class Subject extends Component {
+// 使用高阶组件时,如果用修饰器语法: 传入展示组件的调用可以不写了
+@connect(
+  state => ({ subjectList: state.subjectList }),
+  { getSubjectList }
+)
+class Subject extends Component {
+  componentDidMount() {
+    // 组件挂载的时候,去调用异步anction,发送请求
+    this.props.getSubjectList(1, 10)
+  }
+
   render() {
+    // console.log(this.props)
     return (
       <div className='subject'>
         <Button type='primary' icon={<PlusOutlined />} className='subject-btn'>
@@ -84,7 +99,7 @@ export default class Subject extends Component {
         </Button>
 
         <Table
-        // 表示表格的列的数据
+          // 表示表格的列的数据
           columns={columns}
           expandable={{
             expandedRowRender: record => (
@@ -92,9 +107,13 @@ export default class Subject extends Component {
             ),
             rowExpandable: record => record.name !== 'Not Expandable'
           }}
-          dataSource={data}
+          dataSource={this.props.subjectList.items}
+          // 注意: table组件,在渲染数据的时候,默认使dataSource数据中的key属性的值作为底层列表渲染key的值. 但是我们后台返回的数据没有key属性.table组件支持,我们通过rowkey指定使用我们自己数据中某个属性作为key的值
+          rowKey='_id'
         />
       </div>
     )
   }
 }
+
+export default Subject
