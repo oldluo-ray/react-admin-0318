@@ -87,7 +87,7 @@ const data = [
 class Subject extends Component {
   componentDidMount() {
     // 组件挂载的时候,去调用异步anction,发送请求
-    this.props.getSubjectList(1, 5)
+    this.props.getSubjectList(1, 10)
   }
 
   // 页码发生变化时,触发的回调函数
@@ -129,7 +129,7 @@ class Subject extends Component {
             pageSizeOptions: ['5', '10', '15'],
             // 展示快速跳转到那一页
             showQuickJumper: true,
-            defaultPageSize: 5, // 默认分页器认为每页是10条,改为5条,
+            defaultPageSize: 10, // 默认分页器认为每页是10条,改为5条,
             // onChange: (page, pageSize) => {
             //   console.log(page, pageSize)
             // }
