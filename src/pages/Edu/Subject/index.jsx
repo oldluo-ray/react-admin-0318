@@ -87,7 +87,17 @@ const data = [
 class Subject extends Component {
   componentDidMount() {
     // 组件挂载的时候,去调用异步anction,发送请求
-    this.props.getSubjectList(1, 10)
+    this.props.getSubjectList(1, 5)
+  }
+
+  // 页码发生变化时,触发的回调函数
+  handleChange = (page, pageSize) => {
+    this.props.getSubjectList(page, pageSize)
+  }
+
+  handleShowSizeChange = (page, pageSize) => {
+    // console.log(page, pageSize)
+    this.props.getSubjectList(page, pageSize)
   }
 
   render() {
@@ -118,7 +128,15 @@ class Subject extends Component {
             // 控制一页展示几条的选项
             pageSizeOptions: ['5', '10', '15'],
             // 展示快速跳转到那一页
-            showQuickJumper: true
+            showQuickJumper: true,
+            defaultPageSize: 5, // 默认分页器认为每页是10条,改为5条,
+            // onChange: (page, pageSize) => {
+            //   console.log(page, pageSize)
+            // }
+            // 是页码变化的时候会触发的回调函数
+            onChange: this.handleChange,
+            // 一页展示的数据条数变化的时候触发的函数
+            onShowSizeChange: this.handleShowSizeChange
           }}
         />
       </div>
