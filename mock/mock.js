@@ -35,6 +35,7 @@ app.get('/admin/edu/subject/:page/:limit', (req, res) => {
     total: Random.integer(limit, limit * 2),
     // 数组长度是limit
     // item|num 表示item字段指向的数组的长度
+    // items|10
     [`items|${limit}`]: [
       {
         // _id初始值为1, +1表示会递增

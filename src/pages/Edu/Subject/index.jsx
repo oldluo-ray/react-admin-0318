@@ -110,6 +110,16 @@ class Subject extends Component {
           dataSource={this.props.subjectList.items}
           // 注意: table组件,在渲染数据的时候,默认使dataSource数据中的key属性的值作为底层列表渲染key的值. 但是我们后台返回的数据没有key属性.table组件支持,我们通过rowkey指定使用我们自己数据中某个属性作为key的值
           rowKey='_id'
+          pagination={{
+            // 表示总共有多少条数据, pagination,底层默认一页是10条数据,所以数据是30条,就分3页
+            total: this.props.subjectList.total,
+            // 是否展示一页展示几条数据的修改项
+            showSizeChanger: true,
+            // 控制一页展示几条的选项
+            pageSizeOptions: ['5', '10', '15'],
+            // 展示快速跳转到那一页
+            showQuickJumper: true
+          }}
         />
       </div>
     )

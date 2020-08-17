@@ -9,12 +9,11 @@ const getSubjectListSync = list => ({
   data: list
 })
 
-export const getSubjectList = (page,limit) => {
+export const getSubjectList = (page, limit) => {
   return dispatch => {
-    return reqGetSubject(page,limit).then(response => {
+    return reqGetSubject(page, limit).then(response => {
       dispatch(getSubjectListSync(response))
       return response.total
     })
   }
 }
-
