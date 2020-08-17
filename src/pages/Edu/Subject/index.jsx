@@ -84,6 +84,7 @@ export default class Subject extends Component {
         </Button>
 
         <Table
+        // 表示表格的列的数据
           columns={columns}
           expandable={{
             expandedRowRender: record => (
