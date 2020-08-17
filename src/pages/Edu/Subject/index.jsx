@@ -85,6 +85,14 @@ const data = [
   { getSubjectList }
 )
 class Subject extends Component {
+  // constructor() {
+  //   super()
+
+  //   this.page = 1
+  // }
+
+  page = 1
+
   componentDidMount() {
     // 组件挂载的时候,去调用异步anction,发送请求
     this.props.getSubjectList(1, 10)
@@ -92,12 +100,26 @@ class Subject extends Component {
 
   // 页码发生变化时,触发的回调函数
   handleChange = (page, pageSize) => {
+    console.log('页码变化')
+    // 将当前页码的值赋值为当前组件实例的page属性
+    this.page = page
+
     this.props.getSubjectList(page, pageSize)
   }
 
   handleShowSizeChange = (page, pageSize) => {
+    console.log('页数变化')
     // console.log(page, pageSize)
     this.props.getSubjectList(page, pageSize)
+  }
+
+  // 点击可展开按钮的事件处理函数
+  handleExpand = (expanded, record) => {
+    // console.log(expanded, record)
+    //如果是展开,就发送请求获取二级菜单数据
+    if (expanded) {
+      //发送请求,获取二级菜单数据
+    }
   }
 
   render() {
@@ -112,12 +134,16 @@ class Subject extends Component {
           // 表示表格的列的数据
           columns={columns}
           expandable={{
-            expandedRowRender: record => (
-              <p style={{ margin: 0 }}>{record.description}</p>
-            ),
-            rowExpandable: record => record.name !== 'Not Expandable'
+            // // 控制展开的行展示的内容
+            // expandedRowRender: record => (
+            //   <p style={{ margin: 0 }}>{record.description}</p>
+            // ),
+            // // 控制对应这一行是否有展开按钮, true就是有,false就是没有
+            // rowExpandable: record => record.name !== 'Not Expandable'
+            onExpand: this.handleExpand
           }}
           dataSource={this.props.subjectList.items}
+          // dataSource={data}
           // 注意: table组件,在渲染数据的时候,默认使dataSource数据中的key属性的值作为底层列表渲染key的值. 但是我们后台返回的数据没有key属性.table组件支持,我们通过rowkey指定使用我们自己数据中某个属性作为key的值
           rowKey='_id'
           pagination={{
@@ -136,7 +162,9 @@ class Subject extends Component {
             // 是页码变化的时候会触发的回调函数
             onChange: this.handleChange,
             // 一页展示的数据条数变化的时候触发的函数
-            onShowSizeChange: this.handleShowSizeChange
+            onShowSizeChange: this.handleShowSizeChange,
+            // current控制分页器,哪个页码高亮
+            current: this.page
           }}
         />
       </div>
