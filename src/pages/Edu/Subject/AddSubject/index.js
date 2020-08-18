@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import { Card, Form, Input, Select, Button, Divider } from 'antd'
+import { Card, Form, Input, Select, Button, Divider, message } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
-import { reqGetSubject } from '@api/edu/subject'
+import { reqGetSubject, reqAddSubject } from '@api/edu/subject'
 
 //表单布局属性
 const layout = {
@@ -30,6 +30,7 @@ export default class AddSubject extends Component {
     // reqGetSubject返回的是一个promise对象,所以直接配合await和async可以直接获取到数据
     // this.page++ ,加加在你后面,先将1赋值给函数, 然后page的值加一, 变成了2
     const res = await reqGetSubject(this.page++, 10)
+
     // console.log(res)
     /**
      * {
@@ -58,6 +59,17 @@ export default class AddSubject extends Component {
     })
   }
 
+  // 点击提交按钮,表单校验通过会触发的回调函数
+  onFinish = async values => {
+    // 给后台发送请求
+    // console.log(values)
+    await reqAddSubject(values.subjectname, values.parentid)
+    message.success('添加课程分类成功')
+    // console.log('请求成功了')
+    // 添加成功之后,跳回到list页面
+    this.props.history.push('/edu/subject/list')
+  }
+
   render() {
     console.log(this.state)
     return (
@@ -75,7 +87,7 @@ export default class AddSubject extends Component {
           {...layout}
           name='subject'
           // 表单校验通过了会触发
-          // onFinish={onFinish}
+          onFinish={this.onFinish}
           // 表单校验没有通过触发
           // onFinishFailed={onFinishFailed}
         >
@@ -130,7 +142,7 @@ export default class AddSubject extends Component {
             >
               {/* 注意: Option不是直接从antd中导出的.而是从Select组件上获取到的 */}
               {/* 一级菜单是写死的 */}
-              <Select.Option value={1} key={0}>
+              <Select.Option value={0} key={0}>
                 {'一级菜单'}
               </Select.Option>
               {/* 后面的其他一级课程分类都是动态渲染的 */}
