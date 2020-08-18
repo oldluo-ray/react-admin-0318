@@ -1,49 +1,11 @@
 import React, { Component } from 'react'
-import { Button, Table, Tooltip } from 'antd'
+import { Button, Table, Tooltip, Input } from 'antd'
 import { PlusOutlined, FormOutlined, DeleteOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 
 import { getSubjectList, getSecSubjectList } from './redux'
 
 import './index.less'
-
-const columns = [
-  /**
-   * title: 表示这一列的标题
-   * dataIndex: 表示这一列中要展示data数据的中哪一项值
-   * key: 唯一id
-   */
-  // 注意: 后台返回的数据,课程分类名称的属性是title.不是name.所以记得改一下
-  { title: '分类名称', dataIndex: 'title', key: 'name' },
-  {
-    title: '操作',
-    // 注意: 如果这一列不展示data中的数据,那么就可以不写dataIndex,或者是值为空的字符串
-    // dataIndex: 'age',
-    key: 'x',
-    render: () => (
-      <>
-        <Tooltip title='更新课程'>
-          <Button
-            type='primary'
-            icon={<FormOutlined />}
-            style={{ marginRight: 20, width: 40 }}
-            // size='large'
-            // style={{ width: 40 }}
-          ></Button>
-        </Tooltip>
-        <Tooltip title='删除课程'>
-          <Button
-            type='danger'
-            icon={<DeleteOutlined />}
-            // size='large'
-            style={{ width: 40 }}
-          ></Button>
-        </Tooltip>
-      </>
-    ),
-    width: 200
-  }
-]
 
 const data = [
   {
@@ -91,6 +53,12 @@ class Subject extends Component {
   //   this.page = 1
   // }
 
+  state = {
+    // 如果subjectid有值,就渲染input框, 如果没有就渲染一个普通的标题
+    subjectid: '',
+    title: ''
+  }
+
   page = 1
 
   componentDidMount() {
@@ -130,7 +98,97 @@ class Subject extends Component {
     this.props.history.push('/edu/subject/add')
   }
 
+  // 更新按钮的事件处理函数
+  handleUpdate = ({ _id, title }) => () => {
+    // 我点击的是哪条数据的更新按钮.拿到这条数据的_id
+    // console.log(_id)
+    // 将_id 赋值给state里面的subjectid
+    this.setState({
+      subjectid: _id,
+      title: title
+    })
+  }
+
+  // 更改课程分类标题受控组件的事件处理函数
+  handleUpdateChange = e => {
+    this.setState({
+      title: e.target.value
+    })
+  }
+
   render() {
+    // console.log(1)
+    // 注意: columns里面的数据,要动态变化,所以要放到render函数中
+    const columns = [
+      /**
+       * title: 表示这一列的标题
+       * dataIndex: 表示这一列中要展示data数据的中哪一项值
+       * key: 唯一id
+       */
+      // 注意: 后台返回的数据,课程分类名称的属性是title.不是name.所以记得改一下
+      {
+        title: '分类名称',
+        // dataIndex: 'title',
+        key: 'name',
+
+        render: record => {
+          if (this.state.subjectid === record._id) {
+            return (
+              <Input
+                style={{ width: 300 }}
+                value={this.state.title}
+                onChange={this.handleUpdateChange}
+              ></Input>
+            )
+          }
+          return record.title
+        }
+      },
+      {
+        title: '操作',
+        // 注意: 如果这一列不展示data中的数据,那么就可以不写dataIndex,或者是值为空的字符串
+        // dataIndex: 'age',
+        key: 'x',
+        // 注意: 表格中每一次渲染(行)的时候,都会调用一次这个render函数
+        render: record => {
+          // 这里决定了操作这一列返回什么结构.如果subjectid有值,返回返回确认和取消按钮,如果没有值,就返回更新和删除按钮
+          // 注意: 只修改当前这行数据
+          if (this.state.subjectid === record._id) {
+            // 返回确认和取消
+            return (
+              <>
+                <Button type='primary' style={{ marginRight: 10 }}>
+                  确认
+                </Button>
+                <Button type='danger'>取消</Button>
+              </>
+            )
+          } else {
+            return (
+              <>
+                <Tooltip title='更新课程'>
+                  <Button
+                    type='primary'
+                    icon={<FormOutlined />}
+                    style={{ marginRight: 20, width: 40 }}
+                    onClick={this.handleUpdate(record)}
+                  ></Button>
+                </Tooltip>
+                <Tooltip title='删除课程'>
+                  <Button
+                    type='danger'
+                    icon={<DeleteOutlined />}
+                    // size='large'
+                    style={{ width: 40 }}
+                  ></Button>
+                </Tooltip>
+              </>
+            )
+          }
+        },
+        width: 200
+      }
+    ]
     // console.log(this.props)
     return (
       <div className='subject'>
