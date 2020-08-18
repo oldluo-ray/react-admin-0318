@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { Card, Form, Input, Select, Button } from 'antd'
+import { Card, Form, Input, Select, Button, Divider } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
+import { reqGetSubject } from '@api/edu/subject'
 
 //表单布局属性
 const layout = {
@@ -15,8 +16,50 @@ const layout = {
     span: 6
   }
 }
-export default class index extends Component {
+export default class AddSubject extends Component {
+  page = 1 // 存储要获取第几页 (页数)
+  state = {
+    total: 0,
+    items: []
+  }
+  async componentDidMount() {
+    // 以上来就获取一级课程分类数据(请求的是分页数据,不是所有数据)
+    // 并且第二页数据要拼接在第一页数据后面,不是原来redux逻辑中,第二页数据覆盖第一页
+    // 所以这里不需要操作redux
+    // 直接调用发送异步请求的函数,将数据存储到当前组件的状态中
+    // reqGetSubject返回的是一个promise对象,所以直接配合await和async可以直接获取到数据
+    // this.page++ ,加加在你后面,先将1赋值给函数, 然后page的值加一, 变成了2
+    const res = await reqGetSubject(this.page++, 10)
+    // console.log(res)
+    /**
+     * {
+     *  total:值,
+     *  items: 值
+     * }
+     */
+    // this.setState({
+    //   total: res.total,
+    //   items: res.items
+    // })
+    this.setState(res)
+  }
+
+  // 点击加载更多数据,去获取一级课程分类的数据
+  handleGetSubject = async () => {
+    // 注意: 请求第2,3,4...页的逻辑都是执行这个事件处理函数,所以需要知道到底要请求第几页数据
+    // 解决: 定义一个变量,去存储当前要请求的数据的页数
+    // 因为当前使用的是类组件,最好存到类组件实例的身上
+    const res = await reqGetSubject(this.page++, 10)
+    // 这里拿到的数据是第2,3,4.. 页的数据,需要新的数据和原来的数据拼接起来
+    const newItems = [...this.state.items, ...res.items]
+
+    this.setState({
+      items: newItems
+    })
+  }
+
   render() {
+    console.log(this.state)
     return (
       <Card
         title={
@@ -63,9 +106,39 @@ export default class index extends Component {
               }
             ]}
           >
-            <Select>
+            <Select
+              dropdownRender={menu => {
+                // 注意: menu计时咱们一开始渲染的option
+                // console.log(menu)
+                return (
+                  <div>
+                    {menu}
+                    <Divider style={{ margin: '4px 0' }} />
+                    {this.state.total <= this.state.items.length ? (
+                      <div style={{ color: 'red', marginLeft: 10 }}>
+                        {' '}
+                        没有更多数据了
+                      </div>
+                    ) : (
+                      <Button type='link' onClick={this.handleGetSubject}>
+                        点击加载更多
+                      </Button>
+                    )}
+                  </div>
+                )
+              }}
+            >
               {/* 注意: Option不是直接从antd中导出的.而是从Select组件上获取到的 */}
-              <Select.Option value={1}>{'一级菜单'}</Select.Option>
+              {/* 一级菜单是写死的 */}
+              <Select.Option value={1} key={0}>
+                {'一级菜单'}
+              </Select.Option>
+              {/* 后面的其他一级课程分类都是动态渲染的 */}
+              {this.state.items.map(item => (
+                <Select.Option value={item._id} key={item._id}>
+                  {item.title}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
 
