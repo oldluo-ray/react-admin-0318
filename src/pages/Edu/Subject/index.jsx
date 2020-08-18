@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
-import { Button, Table, Tooltip, Input } from 'antd'
+import { Button, Table, Tooltip, Input, message } from 'antd'
 import { PlusOutlined, FormOutlined, DeleteOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 
 import { getSubjectList, getSecSubjectList } from './redux'
+
+import { reqUpdateSubject } from '@api/edu/subject'
 
 import './index.less'
 
@@ -107,6 +109,9 @@ class Subject extends Component {
       subjectid: _id,
       title: title
     })
+
+    //记录旧的标题名称
+    this.title = title
   }
 
   // 更改课程分类标题受控组件的事件处理函数
@@ -114,6 +119,40 @@ class Subject extends Component {
     this.setState({
       title: e.target.value
     })
+  }
+
+  // 取消按钮的事件处理函数
+  handleCancle = () => {
+    this.setState({
+      subjectid: '',
+      title: ''
+    })
+  }
+  // 确认按钮的事件处理函数
+  handleUpdateConfirm = async () => {
+    //如果输入框是空的,那么就不能更新
+    if (!this.state.title.trim()) {
+      message.success('请输入正确的标题名称')
+      return
+    }
+
+    //判断新的标题名称和旧的标题名称不能相同
+    if (this.state.title === this.title) {
+      message.success('新的标题名称和旧的标题名称不能相同')
+      return
+    }
+
+    let id = this.state.subjectid
+    let title = this.state.title
+    await reqUpdateSubject(id, title)
+    // 提示用户
+    message.success('数据更新成功')
+    this.setState({
+      subjectid: '',
+      title: ''
+    })
+    // 重新请求一级菜单数据即可
+    this.props.getSubjectList(1, 10)
   }
 
   render() {
@@ -132,6 +171,7 @@ class Subject extends Component {
         key: 'name',
 
         render: record => {
+          // 如果subjectid和当前数据的_id一样,这一行展示input,否则直接展示标题
           if (this.state.subjectid === record._id) {
             return (
               <Input
@@ -141,6 +181,7 @@ class Subject extends Component {
               ></Input>
             )
           }
+          // 展示标题
           return record.title
         }
       },
@@ -157,10 +198,16 @@ class Subject extends Component {
             // 返回确认和取消
             return (
               <>
-                <Button type='primary' style={{ marginRight: 10 }}>
+                <Button
+                  type='primary'
+                  style={{ marginRight: 10 }}
+                  onClick={this.handleUpdateConfirm}
+                >
                   确认
                 </Button>
-                <Button type='danger'>取消</Button>
+                <Button type='danger' onClick={this.handleCancle}>
+                  取消
+                </Button>
               </>
             )
           } else {
