@@ -3,7 +3,7 @@ import { Button, Table, Tooltip, Input, message } from 'antd'
 import { PlusOutlined, FormOutlined, DeleteOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 
-import { getSubjectList, getSecSubjectList } from './redux'
+import { getSubjectList, getSecSubjectList, updateSubjectList } from './redux'
 
 import { reqUpdateSubject } from '@api/edu/subject'
 
@@ -46,7 +46,7 @@ const data = [
 // 使用高阶组件时,如果用修饰器语法: 传入展示组件的调用可以不写了
 @connect(
   state => ({ subjectList: state.subjectList }),
-  { getSubjectList, getSecSubjectList }
+  { getSubjectList, getSecSubjectList, updateSubjectList }
 )
 class Subject extends Component {
   // constructor() {
@@ -144,7 +144,10 @@ class Subject extends Component {
 
     let id = this.state.subjectid
     let title = this.state.title
-    await reqUpdateSubject(id, title)
+    // await reqUpdateSubject(id, title)
+    await this.props.updateSubjectList(id, title)
+
+    // console.log(res)
     // 提示用户
     message.success('数据更新成功')
     this.setState({
@@ -152,7 +155,8 @@ class Subject extends Component {
       title: ''
     })
     // 重新请求一级菜单数据即可
-    this.props.getSubjectList(1, 10)
+    // 由于前面直接修改了redux的数据了,所以不需要重新获取最新数据
+    // this.props.getSubjectList(1, 10)
   }
 
   render() {

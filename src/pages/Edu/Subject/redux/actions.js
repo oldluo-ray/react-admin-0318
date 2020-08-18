@@ -1,6 +1,14 @@
-import { reqGetSubject, reqGetSecSubject } from '@api/edu/subject'
+import {
+  reqGetSubject,
+  reqGetSecSubject,
+  reqUpdateSubject
+} from '@api/edu/subject'
 
-import { GET_SUBJECT_LIST, GET_SEC_SUBJECT_LIST } from './constants'
+import {
+  GET_SUBJECT_LIST,
+  GET_SEC_SUBJECT_LIST,
+  UPDATE_SUBJECT
+} from './constants'
 /**
  * 获取一级课程分类
  */
@@ -29,6 +37,30 @@ export const getSecSubjectList = parentId => {
     return reqGetSecSubject(parentId).then(response => {
       dispatch(getSecSubjectListSync(response))
       return response.total
+    })
+  }
+}
+
+// 更新课程分类数据同步action
+//data = {
+//   id:
+//   title:
+// }
+const updateSubjectListSync = data => ({
+  type: UPDATE_SUBJECT,
+  data
+})
+
+export const updateSubjectList = (id, title) => {
+  return dispatch => {
+    // 这里写return 是为了返回promise
+    return reqUpdateSubject(id, title).then(response => {
+      //注意: 这个异步action两个作用:
+      // 1. 在这里发送异步请求,更新后台的数据
+      // 2. 要让reducer执行一次,修改redux里面的数据
+      dispatch(updateSubjectListSync({ id, title }))
+      // 这个return 是为了让异步action调用之后可以拿到一个返回值
+      return 123
     })
   }
 }

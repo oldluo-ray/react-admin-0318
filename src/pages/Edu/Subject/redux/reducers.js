@@ -1,4 +1,8 @@
-import { GET_SUBJECT_LIST, GET_SEC_SUBJECT_LIST } from './constants'
+import {
+  GET_SUBJECT_LIST,
+  GET_SEC_SUBJECT_LIST,
+  UPDATE_SUBJECT
+} from './constants'
 
 const initSubjectList = {
   total: 0, // 总数
@@ -60,6 +64,26 @@ export default function subjectList(prevState = initSubjectList, action) {
       return {
         ...prevState,
         items: FisItems
+      }
+
+    case UPDATE_SUBJECT:
+      // 遍历redux中所有的一级和二级课程分类,根据id找到指定的课程分类,然后修改title属性
+      prevState.items.forEach(item => {
+        if (item._id === action.data.id) {
+          item.title = action.data.title
+          return
+        }
+
+        // 遍历二级
+        item.children.forEach(secItem => {
+          if (secItem._id === action.data.id) {
+            secItem.title = action.data.title
+            return
+          }
+        })
+      })
+      return {
+        ...prevState
       }
     default:
       return prevState
