@@ -124,11 +124,22 @@ class Subject extends Component {
     }
   }
 
+  // 点击跳转到新增课程分类的组件
+  handleToAdd = () => {
+    //利用编程式导航进行路由跳转
+    this.props.history.push('/edu/subject/add')
+  }
+
   render() {
     // console.log(this.props)
     return (
       <div className='subject'>
-        <Button type='primary' icon={<PlusOutlined />} className='subject-btn'>
+        <Button
+          type='primary'
+          icon={<PlusOutlined />}
+          className='subject-btn'
+          onClick={this.handleToAdd}
+        >
           新建
         </Button>
 

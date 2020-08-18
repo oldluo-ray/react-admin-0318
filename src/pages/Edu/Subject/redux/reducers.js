@@ -33,7 +33,7 @@ export default function subjectList(prevState = initSubjectList, action) {
       // console.log(action.data)
       // action.data返回的是对象. total和items. items使我们要用的二级课程数据
       const SecItems = action.data.items
-      console.log(SecItems)
+      // console.log(SecItems)
       // 二级课程分类数据,应该添加到对应的一级课程的children属性里面
       // prevState.items 是所有一级课程分类数据
       // items[0].parentId 是对应的一级课程分类的id
