@@ -144,6 +144,25 @@ class Subject extends Component {
         // record._id 就是要删除的数据的id
         await this.props.delSubjectList(record._id)
         message.success('数据删除成功')
+
+        // 重新获取一级课程分类的数据
+        // 判断如果当前页不是第一页,数据删除完毕了就请求上一页的数据
+        // this.page > 1
+        // this.props.subjectList.length <= 0 表示这一页数据删除完毕了
+        // record.parentId ==='0' 表示这是一级课程分类数据 删除的是一级课程分类才请求上一页的数据
+
+        // 如果当前删除的是一级课程分类,才请求一级课程分类数据
+        if (record.parentId === '0') {
+          if (
+            this.page > 1 &&
+            this.props.subjectList.items.length <= 0 &&
+            record.parentId === '0'
+          ) {
+            this.props.getSubjectList(--this.page, 10)
+            return
+          }
+          this.props.getSubjectList(this.page, 10)
+        }
       }
     })
   }
