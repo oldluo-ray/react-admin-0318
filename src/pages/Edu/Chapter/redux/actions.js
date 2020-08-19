@@ -1,6 +1,7 @@
 import { reqGetAllCourse } from '@api/edu/course'
 import { reqGetChapterList } from '@api/edu/chapter'
-import { GET_ALL_COURSE, GET_CHAPTER_LIST } from './constants'
+import { reqGetLessonList } from '@api/edu/lesson'
+import { GET_ALL_COURSE, GET_CHAPTER_LIST, GET_LESSON_LIST } from './constants'
 
 // 获取所有课程列表数据的action
 // 同步action
@@ -33,6 +34,20 @@ export function getChapterList(courseId) {
     return reqGetChapterList(courseId).then(res => {
       // console.log(res)
       dispatch(getChapterListSync(res))
+    })
+  }
+}
+
+// 获取课时列表
+// 同步action
+function getLessonListSync(data) {
+  return { type: GET_LESSON_LIST, data }
+}
+
+export function getLessonList(chapterId) {
+  return dispatch => {
+    reqGetLessonList(chapterId).then(res => {
+      dispatch(getLessonListSync({ res, chapterId }))
     })
   }
 }

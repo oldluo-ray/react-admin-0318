@@ -15,6 +15,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { connect } from 'react-redux'
 import SearchForm from './SearchForm'
+import { getLessonList } from './redux'
 
 import './index.less'
 
@@ -23,8 +24,8 @@ dayjs.extend(relativeTime)
 @connect(
   state => ({
     chapterList: state.chapterList.chapterList
-  })
-  // { getcourseList }
+  }),
+  { getLessonList }
 )
 class Chapter extends Component {
   state = {
@@ -86,6 +87,25 @@ class Chapter extends Component {
     })
   }
 
+  // 获取课时数据的事件处理函数
+  handleGetLesson = (expand, record) => {
+    // console.log(expand, record)
+    if (expand) {
+      // 展开的时候,去请求课时数据
+      // [
+      // {
+      //     "free": true,
+      //     "video": "http://qbpxkfq77.bkt.clouddn.com/lh4GZyjT-g",
+      //     "gmtCreate": "2020-06-11T16:00:00.000Z",
+      //     "gmtModified": "2020-06-11T16:00:00.000Z",
+      //     "_id": "5ee343f7d9dce01d50447cc0",
+      //     "chapterId": "5ee2cefcd9dce01d50447cb6",
+      //     "title": "肖申克~"
+      // },
+      this.props.getLessonList(record._id)
+    }
+  }
+
   render() {
     console.log(this.props)
     const { previewVisible, previewImage, selectedRowKeys } = this.state
@@ -98,15 +118,22 @@ class Chapter extends Component {
       {
         title: '是否免费',
         dataIndex: 'free',
+        // 注意: 如果不写dataIndex的时候,render指向的函数接收的数据,肯定是一行数据. 但是如果dataIndex写值了,那么render指向的函数接收的数据就是一行数据中指定的某一个属性的值
+        // 比如 上面的dataIndex的值是free.是否render函数中只能接收到一行数据中free属性的值
         render: isFree => {
+          // 如果是章节数据 isFree 是 undefined
+          // 如果是课时数据 isFree 返回的是 布尔值
           return isFree === true ? '是' : isFree === false ? '否' : ''
         }
       },
       {
         title: '视频',
         // dataIndex: 'free',
-        render: () => {
-          return '预览视频'
+        render: record => {
+          if (record.free) {
+            return <Button>预览</Button>
+          }
+          return null
         }
       },
       {
@@ -294,6 +321,9 @@ class Chapter extends Component {
             columns={columns}
             dataSource={this.props.chapterList}
             rowKey='_id'
+            expandable={{
+              onExpand: this.handleGetLesson
+            }}
           />
         </div>
 
