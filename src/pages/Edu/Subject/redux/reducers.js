@@ -1,7 +1,8 @@
 import {
   GET_SUBJECT_LIST,
   GET_SEC_SUBJECT_LIST,
-  UPDATE_SUBJECT
+  UPDATE_SUBJECT,
+  DELETE_SUBJECT
 } from './constants'
 
 const initSubjectList = {
@@ -84,6 +85,29 @@ export default function subjectList(prevState = initSubjectList, action) {
       })
       return {
         ...prevState
+      }
+
+    case DELETE_SUBJECT:
+      const FirstSubjects = [...prevState.items]
+      // 将redux中的某条数据删除掉.有可能是一级课程分类,有可能是二级课程分类
+      // 找到一级课程分类
+      FirstSubjects.forEach((item, index) => {
+        // 注意: action.data就是传过来要删除的id
+        if (item._id === action.data) {
+          FirstSubjects.splice(index, 1)
+          return
+        }
+        // item.children就是二级课程分类
+        item.children.forEach((secItem, index) => {
+          if (secItem._id === action.data) {
+            item.children.splice(index, 1)
+            return
+          }
+        })
+      })
+      return {
+        ...prevState,
+        items: FirstSubjects
       }
     default:
       return prevState

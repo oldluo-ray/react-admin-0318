@@ -1,52 +1,23 @@
 import React, { Component } from 'react'
-import { Button, Table, Tooltip, Input, message } from 'antd'
+import { Button, Table, Tooltip, Input, message, Modal } from 'antd'
 import { PlusOutlined, FormOutlined, DeleteOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 
-import { getSubjectList, getSecSubjectList, updateSubjectList } from './redux'
+import {
+  getSubjectList,
+  getSecSubjectList,
+  updateSubjectList,
+  delSubjectList
+} from './redux'
 
 import { reqUpdateSubject } from '@api/edu/subject'
 
 import './index.less'
 
-const data = [
-  {
-    key: 1,
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    description:
-      'My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.'
-  },
-  {
-    key: 2,
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    description:
-      'My name is Jim Green, I am 42 years old, living in London No. 1 Lake Park.'
-  },
-  {
-    key: 3,
-    name: 'Not Expandable',
-    age: 29,
-    address: 'Jiangsu No. 1 Lake Park',
-    description: 'This not expandable'
-  },
-  {
-    key: 4,
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    description:
-      'My name is Joe Black, I am 32 years old, living in Sidney No. 1 Lake Park.'
-  }
-]
-
 // 使用高阶组件时,如果用修饰器语法: 传入展示组件的调用可以不写了
 @connect(
   state => ({ subjectList: state.subjectList }),
-  { getSubjectList, getSecSubjectList, updateSubjectList }
+  { getSubjectList, getSecSubjectList, updateSubjectList, delSubjectList }
 )
 class Subject extends Component {
   // constructor() {
@@ -159,6 +130,24 @@ class Subject extends Component {
     // this.props.getSubjectList(1, 10)
   }
 
+  // 删除课程分类的事件处理函数
+  handleDel = record => () => {
+    Modal.confirm({
+      title: (
+        <div>
+          你确定要删除
+          <span style={{ color: 'red', margin: '0 10px' }}>{record.title}</span>
+          课程分类嘛?
+        </div>
+      ),
+      onOk: async () => {
+        // record._id 就是要删除的数据的id
+        await this.props.delSubjectList(record._id)
+        message.success('数据删除成功')
+      }
+    })
+  }
+
   render() {
     // console.log(1)
     // 注意: columns里面的数据,要动态变化,所以要放到render函数中
@@ -231,6 +220,7 @@ class Subject extends Component {
                     icon={<DeleteOutlined />}
                     // size='large'
                     style={{ width: 40 }}
+                    onClick={this.handleDel(record)}
                   ></Button>
                 </Tooltip>
               </>
