@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Form, Select, Button } from 'antd'
 import { connect } from 'react-redux'
 
-import { getCourseList } from '../redux'
+import { getCourseList, getChapterList } from '../redux'
 
 import './index.less'
 
@@ -20,10 +20,14 @@ function SearchForm(props) {
     props.getCourseList()
   }, [])
 
-  console.log(props)
+  // console.log(props)
+  const onFinish = values => {
+    // console.log(values)
+    props.getChapterList(values.courseId)
+  }
   return (
-    <Form layout='inline' form={form}>
-      <Form.Item name='teacherId' label='课程'>
+    <Form layout='inline' form={form} onFinish={onFinish}>
+      <Form.Item name='courseId' label='课程'>
         <Select
           allowClear
           placeholder='课程'
@@ -56,5 +60,5 @@ function SearchForm(props) {
 export default connect(
   // state是redux中所有的属性
   state => ({ courseList: state.chapterList.allCourseList }),
-  { getCourseList }
+  { getCourseList, getChapterList }
 )(SearchForm)
