@@ -22,6 +22,7 @@ export function getCourseList() {
 // 获取所有章节列表的action
 // 同步action
 function getChapterListSync(data) {
+  // console.log(data)
   return { type: GET_CHAPTER_LIST, data }
 }
 

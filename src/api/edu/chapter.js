@@ -7,6 +7,7 @@ const BASE_URL = '/admin/edu/chapter'
 
 // 获取所有课程列表数据
 export function reqGetChapterList(courseId) {
+  // console.log(courseId)
   return request({
     url: `${BASE_URL}/1/10`,
     method: 'GET',

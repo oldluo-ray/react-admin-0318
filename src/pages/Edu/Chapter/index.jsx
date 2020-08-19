@@ -103,31 +103,36 @@ class Chapter extends Component {
         }
       },
       {
+        title: '视频',
+        // dataIndex: 'free',
+        render: () => {
+          return '预览视频'
+        }
+      },
+      {
         title: '操作',
-        width: 300,
+        width: 210,
         fixed: 'right',
         render: data => {
-          if ('free' in data) {
-            return (
-              <div>
-                <Tooltip title='查看详情'>
-                  <Button>
-                    <SettingOutlined />
-                  </Button>
-                </Tooltip>
-                <Tooltip title='更新章节'>
-                  <Button type='primary' style={{ margin: '0 10px' }}>
-                    <FormOutlined />
-                  </Button>
-                </Tooltip>
-                <Tooltip title='删除章节'>
-                  <Button type='danger'>
-                    <DeleteOutlined />
-                  </Button>
-                </Tooltip>
-              </div>
-            )
-          }
+          return (
+            <div>
+              <Tooltip title='新增课时'>
+                <Button type='primary'>
+                  <PlusOutlined />
+                </Button>
+              </Tooltip>
+              <Tooltip title='更新章节'>
+                <Button type='primary' style={{ margin: '0 10px' }}>
+                  <FormOutlined />
+                </Button>
+              </Tooltip>
+              <Tooltip title='删除章节'>
+                <Button type='danger'>
+                  <DeleteOutlined />
+                </Button>
+              </Tooltip>
+            </div>
+          )
         }
       }
     ]
@@ -287,8 +292,8 @@ class Chapter extends Component {
           <Table
             rowSelection={rowSelection}
             columns={columns}
-            dataSource={data}
-            rowKey='id'
+            dataSource={this.props.chapterList}
+            rowKey='_id'
           />
         </div>
 

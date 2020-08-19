@@ -22,7 +22,7 @@ function SearchForm(props) {
 
   // console.log(props)
   const onFinish = values => {
-    // console.log(values)
+    console.log(values)
     props.getChapterList(values.courseId)
   }
   return (
