@@ -78,11 +78,18 @@ export default class MyUpload extends Component {
         onError(err)
       },
       // 完成触发
-      complete(res) {
+      complete: res => {
         // ...
         console.log('上传完成', res)
         // 如果想要上传成功之后,有一个成功的样式,需要调用onSuccess
         onSuccess(res)
+
+        // 在这里调用Form.Item传过来的onChange就可以了
+        // 通过props获取onChange
+        // 一旦调用onchange, 表单就可以控制上传视频表单项的值
+        // this.props.onChange('视频路径')
+        // res返回的是一个对象: 里面还有一个key属性,就是文件名
+        this.props.onChange('http://qfek9x5vz.hn-bkt.clouddn.com/' + res.key)
       }
     }
 
@@ -109,7 +116,7 @@ export default class MyUpload extends Component {
   }
 
   componentWillUnmount() {
-    this.subscription.unsubscribe() // 上传取消
+    this.subscription && this.subscription.unsubscribe() // 上传取消
   }
   render() {
     return (

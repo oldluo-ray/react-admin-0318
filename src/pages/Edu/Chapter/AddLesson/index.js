@@ -18,6 +18,9 @@ const layout = {
   }
 }
 export default class AddLesson extends Component {
+  onFinish = values => {
+    console.log(values)
+  }
   render() {
     return (
       <Card
