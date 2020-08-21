@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
-import { Card, Form, Input, Button, Switch } from 'antd'
+import { Card, Form, Input, Button, Switch, message } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
 
 import MyUpload from '@comps/Upload'
+import { addLesson } from '@api/edu/lesson'
 
 //表单布局属性
 const layout = {
@@ -18,8 +19,20 @@ const layout = {
   }
 }
 export default class AddLesson extends Component {
-  onFinish = values => {
+  onFinish = async values => {
     console.log(values)
+    const { title, free, video } = values
+    // 拿到章节id
+    const chapterId = this.props.location.state._id
+    const data = {
+      chapterId,
+      title,
+      free,
+      video
+    }
+    await addLesson(data)
+    message.success('课时添加成功')
+    this.props.history.push('/edu/chapter/list')
   }
   render() {
     return (
@@ -50,7 +63,7 @@ export default class AddLesson extends Component {
             // 表单项的提示文字
             label='课时名称'
             // 表单上传数据的键
-            name='lessonname'
+            name='title'
             // 配置表单校验
             rules={[
               {

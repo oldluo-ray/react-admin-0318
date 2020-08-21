@@ -118,6 +118,12 @@ export default class MyUpload extends Component {
   componentWillUnmount() {
     this.subscription && this.subscription.unsubscribe() // 上传取消
   }
+
+  // 删除视频时触发
+  handleRemove = () => {
+    //为了解决,删除视频之后,表单验证通过的问题,需要调用onChange.将值赋值为空字符串
+    this.props.onChange('')
+  }
   render() {
     return (
       <Upload
@@ -126,6 +132,8 @@ export default class MyUpload extends Component {
         beforeUpload={this.handleBeforeUpload}
         // customRequest 是真正将视频上传到七牛云的时候执行的
         customRequest={this.handleCustomRequest}
+        // 当删除上传的视频的时候,触发
+        onRemove={this.handleRemove}
       >
         <Button>
           <UploadOutlined /> 上传视频
