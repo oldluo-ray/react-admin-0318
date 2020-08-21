@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Button, Upload } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
+import * as qiniu from 'qiniu-js'
+import { nanoid } from 'nanoid'
 import { reqGetUploadToken } from '@api/edu/lesson'
 
 export default class MyUpload extends Component {
@@ -25,7 +27,7 @@ export default class MyUpload extends Component {
     // 注意: 在BeforeUpload做两件事件
     // 1. 判断上传的视频的大小,如果超过限制值就不传了
     // 20M
-    const MAX_SIZE = 5 * 1024 * 1024
+    const MAX_SIZE = 10 * 1024 * 1024
 
     return new Promise(async (resolve, reject) => {
       if (file.size > MAX_SIZE) {
@@ -42,6 +44,7 @@ export default class MyUpload extends Component {
       if (this.tokenObj.expires && this.tokenObj.expires > Date.now()) {
         return resolve()
       }
+      console.log('发请求了')
       const res = await reqGetUploadToken()
       //   console.log(res)
       // 拿到上传token和过期时间要存起来
@@ -57,8 +60,56 @@ export default class MyUpload extends Component {
       resolve()
     })
   }
-  handleCustomRequest = () => {
-    console.log('实现将视频上传到七牛云的操作')
+  handleCustomRequest = ({ file, onProgress, onError, onSuccess }) => {
+    // console.log(options, x)
+    const observer = {
+      // 上传过程中,一直触发
+      next(res) {
+        // ...
+        // console.log('正在上传', res)
+        // 注意:antd中upload组件如果想展示进度. 需要调用onProgress({precent: 值})
+        onProgress({ percent: res.total.percent })
+      },
+      // 失败触发
+      error(err) {
+        // ...
+        console.log('上传错误', err)
+        // 如果想要上传错误的时候,展示一个错误的样式.需要调用onError
+        onError(err)
+      },
+      // 完成触发
+      complete(res) {
+        // ...
+        console.log('上传完成', res)
+        // 如果想要上传成功之后,有一个成功的样式,需要调用onSuccess
+        onSuccess(res)
+      }
+    }
+
+    // 要上传的文件对象
+    // const file = options.file
+    // 返回一个长度为10的唯一值
+    // 文件名称
+    const key = nanoid(10)
+    console.log(key)
+    // 上传凭证
+    const token = this.tokenObj.uploadToken
+    // 配置项:
+    const config = {
+      //上传视频到哪个区 z2 表示 华南地区
+      region: qiniu.region.z2
+    }
+    // 额外的配置项
+    const putExtra = {
+      // 后台允许上传什么类型的文件
+      mimeType: 'video/*'
+    }
+    const observable = qiniu.upload(file, key, token, putExtra, config)
+    this.subscription = observable.subscribe(observer) // 上传开始
+  }
+
+  componentWillUnmount() {
+    this.subscription.unsubscribe() // 上传取消
   }
   render() {
     return (
