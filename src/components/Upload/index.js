@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Upload } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
+import { reqGetUploadToken } from '@api/edu/lesson'
 
 export default class MyUpload extends Component {
   handleBeforeUpload = (file, fileList) => {
@@ -8,12 +9,22 @@ export default class MyUpload extends Component {
     // 1. 判断上传的视频的大小,如果超过限制值就不传了
     // 20M
     const MAX_SIZE = 5 * 1024 * 1024
-    // 2. 给本地服务器发送请求,获取token
-    return new Promise((resolve, reject) => {
-      if (file.size < MAX_SIZE) {
-        resolve()
+
+    return new Promise(async (resolve, reject) => {
+      if (file.size > MAX_SIZE) {
+        return reject()
       }
-      return reject()
+
+      // 2. 给本地服务器发送请求,获取token
+      const res = await reqGetUploadToken()
+      //   console.log(res)
+      // 拿到上传token和过期时间要存起来
+      // 一个要存到组件中, 一个要存到本地缓存里面
+      this.tokenObj = res
+      // 由于localstorage里面不能直接存储对象,要转成json字符串
+      const jsonStr = JSON.stringify(res)
+      localStorage.setItem('uploadToken', jsonStr)
+      resolve()
     })
   }
   handleCustomRequest = () => {

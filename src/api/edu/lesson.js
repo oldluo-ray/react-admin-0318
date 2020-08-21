@@ -13,3 +13,10 @@ export function reqGetLessonList(chapterId) {
     method: 'GET'
   })
 }
+
+export function reqGetUploadToken() {
+  return request({
+    url: '/uploadtoken',
+    method: 'GET'
+  })
+}
