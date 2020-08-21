@@ -1,17 +1,9 @@
 import React, { Component } from 'react'
-import {
-  Card,
-  Form,
-  Input,
-  Select,
-  Button,
-  Divider,
-  message,
-  Switch,
-  Upload
-} from 'antd'
-import { ArrowLeftOutlined, UploadOutlined } from '@ant-design/icons'
+import { Card, Form, Input, Button, Switch } from 'antd'
+import { ArrowLeftOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
+
+import MyUpload from '@comps/Upload'
 
 //表单布局属性
 const layout = {
@@ -34,7 +26,7 @@ export default class AddLesson extends Component {
             <Link to='/edu/chapter/list'>
               <ArrowLeftOutlined />
             </Link>
-            <span style={{ marginLeft: 10 }}>新增课程</span>
+            <span style={{ marginLeft: 10 }}>新增课时</span>
           </>
         }
       >
@@ -45,6 +37,11 @@ export default class AddLesson extends Component {
           onFinish={this.onFinish}
           // 表单校验没有通过触发
           // onFinishFailed={onFinishFailed}
+          // 给表单里面的表单项添加默认值:
+          initialValues={{
+            // lessonname: '呵呵',
+            free: true
+          }}
         >
           <Form.Item
             // 表单项的提示文字
@@ -56,7 +53,7 @@ export default class AddLesson extends Component {
               {
                 required: true, // 表示这个表单项是必填项
                 // 表单校验不成功的提示文字
-                message: '请输入课程分类!'
+                message: '请输入课时!'
               }
             ]}
           >
@@ -64,6 +61,7 @@ export default class AddLesson extends Component {
           </Form.Item>
 
           <Form.Item
+            valuePropName='checked'
             // 表单项的提示文字
             label='是否免费'
             // 表单上传数据的键
@@ -77,6 +75,13 @@ export default class AddLesson extends Component {
               }
             ]}
           >
+            {/* 注意: Switch的值是checked属性控制,但是Form.Item组件默认控制表单项的value属性,
+            由于switch没有value属性,所以报错:  Warning: [antd: Switch] `value` is not validate prop, do you mean `checked`? 
+            
+            解决方式: 告诉Form.Item控制switch的checked 
+            Form.Item组件身上的属性valuePropName='checked'
+            
+            */}
             <Switch
               checkedChildren='开启'
               unCheckedChildren='关闭'
@@ -98,11 +103,8 @@ export default class AddLesson extends Component {
               }
             ]}
           >
-            <Upload>
-              <Button>
-                <UploadOutlined /> 上传视频
-              </Button>
-            </Upload>
+            {/* 注意: 上传视频代码比较多,所以单独抽取出来放到MyUpload组件中 */}
+            <MyUpload></MyUpload>
           </Form.Item>
 
           <Form.Item>
