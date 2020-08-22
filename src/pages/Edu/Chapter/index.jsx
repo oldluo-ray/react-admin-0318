@@ -16,7 +16,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { connect } from 'react-redux'
 import SearchForm from './SearchForm'
-import { getLessonList } from './redux'
+import { getLessonList, delChapterList, delLessonList } from './redux'
 
 import './index.less'
 
@@ -26,7 +26,7 @@ dayjs.extend(relativeTime)
   state => ({
     chapterList: state.chapterList.chapterList
   }),
-  { getLessonList }
+  { getLessonList, delChapterList, delLessonList }
 )
 class Chapter extends Component {
   state = {
@@ -123,7 +123,7 @@ class Chapter extends Component {
   }
 
   // 批量删除的回调函数
-  handleBatchRemove = () => {
+  handleBatchRemove = async () => {
     // 1. 从selectedRowKeys找到那些是章节的id, 哪些是课时的id
     // 思路:遍历所有章节数据, 遍历过程中,如果selectedRowKeys的值,和某一个章节的_id是一样的.说明这个id是章节id. 在遍历的过程中把是章节id的值,过滤出来,剩下的就是课时
     // [
@@ -137,6 +137,7 @@ class Chapter extends Component {
     const chapterIdList = []
     this.props.chapterList.forEach(item => {
       // 1.3 判断是否章节id
+      // 1.4 过滤章节id
       if (this.state.selectedRowKeys.indexOf(item._id) > -1) {
         // 找到了
         chapterIdList.push(item._id)
@@ -154,9 +155,11 @@ class Chapter extends Component {
       return true
     })
 
-    console.log(chapterIdList, lessonIdList)
-
-    // 1.4 过滤章节id
+    // console.log(chapterIdList, lessonIdList)
+    // delChapterList, delLessonList
+    await this.props.delChapterList(chapterIdList)
+    await this.props.delLessonList(lessonIdList)
+    message.success('批量删除成功')
   }
 
   render() {
