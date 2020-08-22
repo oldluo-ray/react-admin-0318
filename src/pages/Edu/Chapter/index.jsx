@@ -122,6 +122,43 @@ class Chapter extends Component {
     // this.play_url = record.video
   }
 
+  // 批量删除的回调函数
+  handleBatchRemove = () => {
+    // 1. 从selectedRowKeys找到那些是章节的id, 哪些是课时的id
+    // 思路:遍历所有章节数据, 遍历过程中,如果selectedRowKeys的值,和某一个章节的_id是一样的.说明这个id是章节id. 在遍历的过程中把是章节id的值,过滤出来,剩下的就是课时
+    // [
+    //   '5f4083d344cac92d8849aad5',
+    //   '5f4085bf44cac92d8849aad6',
+    //   '5ee2cf0dd9dce01d50447cb8',
+    //   '5ee2cefcd9dce01d50447cb6'
+    // ]
+    // 1.1 拿到所有章节数据
+    // 1.2 遍历章节
+    const chapterIdList = []
+    this.props.chapterList.forEach(item => {
+      // 1.3 判断是否章节id
+      if (this.state.selectedRowKeys.indexOf(item._id) > -1) {
+        // 找到了
+        chapterIdList.push(item._id)
+      }
+    })
+
+    // console.log(chapterIdList)
+
+    // 从selectedRowKeys 找到课时,存到一个新的数组中
+    const lessonIdList = this.state.selectedRowKeys.filter(item => {
+      // 遍历过程中,查看item是否在chapterIdList里面,如果在说明章节id,否则是课时id
+      if (chapterIdList.indexOf(item) > -1) {
+        return false
+      }
+      return true
+    })
+
+    console.log(chapterIdList, lessonIdList)
+
+    // 1.4 过滤章节id
+  }
+
   render() {
     const { previewVisible, previewImage, selectedRowKeys } = this.state
 
@@ -259,39 +296,6 @@ class Chapter extends Component {
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange
-      // hideDefaultSelections: true,
-      // selections: [
-      //   Table.SELECTION_ALL,
-      //   Table.SELECTION_INVERT,
-      //   {
-      //     key: "odd",
-      //     text: "Select Odd Row",
-      //     onSelect: changableRowKeys => {
-      //       let newSelectedRowKeys = [];
-      //       newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-      //         if (index % 2 !== 0) {
-      //           return false;
-      //         }
-      //         return true;
-      //       });
-      //       this.setState({ selectedRowKeys: newSelectedRowKeys });
-      //     }
-      //   },
-      //   {
-      //     key: "even",
-      //     text: "Select Even Row",
-      //     onSelect: changableRowKeys => {
-      //       let newSelectedRowKeys = [];
-      //       newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-      //         if (index % 2 !== 0) {
-      //           return true;
-      //         }
-      //         return false;
-      //       });
-      //       this.setState({ selectedRowKeys: newSelectedRowKeys });
-      //     }
-      //   }
-      // ]
     }
 
     const sources = {
@@ -319,7 +323,11 @@ class Chapter extends Component {
                 <PlusOutlined />
                 <span>新增</span>
               </Button>
-              <Button type='danger' style={{ marginRight: 10 }}>
+              <Button
+                type='danger'
+                style={{ marginRight: 10 }}
+                onClick={this.handleBatchRemove}
+              >
                 <span>批量删除</span>
               </Button>
               <Tooltip title='全屏' className='course-table-btn'>

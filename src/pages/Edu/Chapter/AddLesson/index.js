@@ -20,7 +20,6 @@ const layout = {
 }
 export default class AddLesson extends Component {
   onFinish = async values => {
-    console.log(values)
     const { title, free, video } = values
     // 拿到章节id
     const chapterId = this.props.location.state._id
@@ -30,6 +29,7 @@ export default class AddLesson extends Component {
       free,
       video
     }
+    console.log(data)
     await addLesson(data)
     message.success('课时添加成功')
     this.props.history.push('/edu/chapter/list')

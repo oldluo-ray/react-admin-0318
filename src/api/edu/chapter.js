@@ -16,3 +16,15 @@ export function reqGetChapterList(courseId) {
     }
   })
 }
+
+// 批量删除章节
+export function reqBatchRemoveChapterList(chapterIdList) {
+  // console.log(courseId)
+  return request({
+    url: `${BASE_URL}/batchRemove`,
+    method: 'DELETE',
+    data: {
+      idList: chapterIdList
+    }
+  })
+}
