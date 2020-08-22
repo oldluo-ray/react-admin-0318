@@ -13,6 +13,7 @@ import dayjs from 'dayjs'
 import Player from 'griffith'
 
 import relativeTime from 'dayjs/plugin/relativeTime'
+import screenfull from 'screenfull'
 
 import { connect } from 'react-redux'
 import SearchForm from './SearchForm'
@@ -334,7 +335,12 @@ class Chapter extends Component {
                 <span>批量删除</span>
               </Button>
               <Tooltip title='全屏' className='course-table-btn'>
-                <FullscreenOutlined />
+                <FullscreenOutlined
+                  onClick={() => {
+                    // screenfull.request()
+                    screenfull.toggle()
+                  }}
+                />
               </Tooltip>
               <Tooltip title='刷新' className='course-table-btn'>
                 <RedoOutlined />
