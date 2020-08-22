@@ -10,6 +10,7 @@ import {
   DeleteOutlined
 } from '@ant-design/icons'
 import dayjs from 'dayjs'
+import Player from 'griffith'
 
 import relativeTime from 'dayjs/plugin/relativeTime'
 
@@ -32,7 +33,8 @@ class Chapter extends Component {
     searchLoading: false,
     previewVisible: false,
     previewImage: '',
-    selectedRowKeys: []
+    selectedRowKeys: [],
+    play_url: ''
   }
 
   showImgModal = img => {
@@ -111,8 +113,16 @@ class Chapter extends Component {
     this.props.history.push('/edu/chapter/addlesson', data)
   }
 
+  // 预览视频,展示modal窗口的事件处理函数
+  handlePreviewVideo = record => () => {
+    this.setState({
+      previewVisible: true,
+      play_url: record.video
+    })
+    // this.play_url = record.video
+  }
+
   render() {
-    console.log(this.props)
     const { previewVisible, previewImage, selectedRowKeys } = this.state
 
     const columns = [
@@ -136,7 +146,9 @@ class Chapter extends Component {
         // dataIndex: 'free',
         render: record => {
           if (record.free) {
-            return <Button>预览</Button>
+            return (
+              <Button onClick={this.handlePreviewVideo(record)}>预览</Button>
+            )
           }
           return null
         }
@@ -282,6 +294,18 @@ class Chapter extends Component {
       // ]
     }
 
+    const sources = {
+      hd: {
+        play_url: this.state.play_url,
+        bitrate: 1,
+        duration: 1000,
+        format: '',
+        height: 500,
+        size: 160000,
+        width: 500
+      }
+    }
+
     return (
       <div>
         <div className='course-search'>
@@ -331,13 +355,21 @@ class Chapter extends Component {
             }}
           />
         </div>
-
+        {/*  直接使用这个modal去预览视频 */}
         <Modal
           visible={previewVisible}
+          title='预览课时'
           footer={null}
           onCancel={this.handleImgModal}
+          // modal关闭,但是视频还在播放. 解决办法: modal关闭的时候,销毁子节点
+          destroyOnClose={true}
         >
-          <img alt='example' style={{ width: '100%' }} src={previewImage} />
+          <Player
+            sources={sources}
+            id={'1'}
+            cover={'http://localhost:3000/logo512.png'}
+            duration={1000}
+          ></Player>
         </Modal>
       </div>
     )

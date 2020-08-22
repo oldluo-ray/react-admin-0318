@@ -10,6 +10,10 @@ export default class MyUpload extends Component {
   constructor() {
     super()
 
+    this.state = {
+      isShowUpload: true
+    }
+
     // 从本地缓存中获取uploadToken
     // 如果之前从来没有上传过视频,本地缓存中没有token. 直接给this.tokenObj = {}
     // 如果之前存储过,赋值给存储的那个token
@@ -84,6 +88,10 @@ export default class MyUpload extends Component {
         // 如果想要上传成功之后,有一个成功的样式,需要调用onSuccess
         onSuccess(res)
 
+        this.setState({
+          isShowUpload: false
+        })
+
         // 在这里调用Form.Item传过来的onChange就可以了
         // 通过props获取onChange
         // 一旦调用onchange, 表单就可以控制上传视频表单项的值
@@ -109,6 +117,7 @@ export default class MyUpload extends Component {
     // 额外的配置项
     const putExtra = {
       // 后台允许上传什么类型的文件
+      // 后台控制
       mimeType: 'video/*'
     }
     const observable = qiniu.upload(file, key, token, putExtra, config)
@@ -123,6 +132,9 @@ export default class MyUpload extends Component {
   handleRemove = () => {
     //为了解决,删除视频之后,表单验证通过的问题,需要调用onChange.将值赋值为空字符串
     this.props.onChange('')
+    this.setState({
+      isShowUpload: true
+    })
   }
   render() {
     return (
@@ -134,10 +146,15 @@ export default class MyUpload extends Component {
         customRequest={this.handleCustomRequest}
         // 当删除上传的视频的时候,触发
         onRemove={this.handleRemove}
+        // 表示在前端只能选择视频
+        // 前端控制
+        accept='video/*'
       >
-        <Button>
-          <UploadOutlined /> 上传视频
-        </Button>
+        {this.state.isShowUpload && (
+          <Button>
+            <UploadOutlined /> 上传视频
+          </Button>
+        )}
       </Upload>
     )
   }
