@@ -3,7 +3,8 @@ import { Form, Input, Select, Cascader, Button } from 'antd'
 import { reqAllSubjectList, reqGetSecSubject } from '@api/edu/subject'
 import { reqGetAllTeacherList } from '@api/edu/teacher'
 import { connect } from 'react-redux'
-
+// 国际化的组件和hooks
+import { FormattedMessage, useIntl } from 'react-intl'
 import { getAllCourseList } from '../redux'
 
 import './index.less'
@@ -12,6 +13,8 @@ const { Option } = Select
 
 function SearchForm(props) {
   const [form] = Form.useForm()
+  // 获取一个国际化对象
+  const intl = useIntl()
 
   const [subjects, setSubjects] = useState([])
   const [teachers, setTeachers] = useState([])
@@ -110,13 +113,20 @@ function SearchForm(props) {
 
   return (
     <Form layout='inline' form={form} onFinish={onFinish}>
-      <Form.Item name='title' label='标题'>
-        <Input placeholder='课程标题' style={{ width: 250, marginRight: 20 }} />
+      <Form.Item name='title' label={<FormattedMessage id='title' />}>
+        <Input
+          placeholder={intl.formatMessage({
+            id: 'title'
+          })}
+          style={{ width: 250, marginRight: 20 }}
+        />
       </Form.Item>
-      <Form.Item name='teacherId' label='讲师'>
+      <Form.Item name='teacherId' label={<FormattedMessage id='teacher' />}>
         <Select
           allowClear
-          placeholder='课程讲师'
+          placeholder={intl.formatMessage({
+            id: 'teacher'
+          })}
           style={{ width: 250, marginRight: 20 }}
         >
           {teachers.map(item => (
@@ -129,7 +139,7 @@ function SearchForm(props) {
           <Option value='lucy3'>Lucy3</Option> */}
         </Select>
       </Form.Item>
-      <Form.Item name='subject' label='分类'>
+      <Form.Item name='subject' label={<FormattedMessage id='subject' />}>
         <Cascader
           style={{ width: 250, marginRight: 20 }}
           options={options}
@@ -139,7 +149,9 @@ function SearchForm(props) {
           onChange={onChange}
           // changeOnSelect 值为true时,只要顶级了多级联动,就触发onchange. 为false时,只有选中之后才会触发
           // changeOnSelect = {true}
-          placeholder='课程分类'
+          placeholder={intl.formatMessage({
+            id: 'subject'
+          })}
         />
       </Form.Item>
       <Form.Item>
@@ -148,9 +160,9 @@ function SearchForm(props) {
           htmlType='submit'
           style={{ margin: '0 10px 0 30px' }}
         >
-          查询
+          <FormattedMessage id='searchBtn' />
         </Button>
-        <Button onClick={resetForm}>重置</Button>
+        <Button onClick={resetForm}> <FormattedMessage id='resetBtn' /></Button>
       </Form.Item>
     </Form>
   )
