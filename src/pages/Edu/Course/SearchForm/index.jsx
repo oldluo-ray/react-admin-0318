@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { Form, Input, Select, Cascader, Button } from 'antd'
 import { reqAllSubjectList, reqGetSecSubject } from '@api/edu/subject'
 import { reqGetAllTeacherList } from '@api/edu/teacher'
+import { connect } from 'react-redux'
+
+import { getAllCourseList } from '../redux'
 
 import './index.less'
 
 const { Option } = Select
 
-function SearchForm() {
+function SearchForm(props) {
   const [form] = Form.useForm()
 
   const [subjects, setSubjects] = useState([])
@@ -100,8 +103,13 @@ function SearchForm() {
     form.resetFields()
   }
 
+  // 查询课程列表的事件处理函数
+  const onFinish = () => {
+    props.getAllCourseList()
+  }
+
   return (
-    <Form layout='inline' form={form}>
+    <Form layout='inline' form={form} onFinish={onFinish}>
       <Form.Item name='title' label='标题'>
         <Input placeholder='课程标题' style={{ width: 250, marginRight: 20 }} />
       </Form.Item>
@@ -148,4 +156,7 @@ function SearchForm() {
   )
 }
 
-export default SearchForm
+export default connect(
+  null,
+  { getAllCourseList }
+)(SearchForm)
