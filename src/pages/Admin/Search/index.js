@@ -1,14 +1,157 @@
 import React, { Component } from 'react'
 import { Tabs } from 'antd'
 import { RingProgressChart } from 'bizcharts'
+import {
+  G2,
+  Chart,
+  Geom,
+  Axis,
+  Tooltip,
+  Coord,
+  Label,
+  Legend,
+  View,
+  Guide,
+  Shape,
+  Facet,
+  Util
+} from 'bizcharts'
 
 const { TabPane } = Tabs
+
+const data = [
+  {
+    month: 'Jan',
+    city: 'Tokyo',
+    temperature: 7
+  },
+  {
+    month: 'Jan',
+    city: 'London',
+    temperature: 3.9
+  },
+  {
+    month: 'Feb',
+    city: 'Tokyo',
+    temperature: 6.9
+  },
+  {
+    month: 'Feb',
+    city: 'London',
+    temperature: 4.2
+  },
+  {
+    month: 'Mar',
+    city: 'Tokyo',
+    temperature: 9.5
+  },
+  {
+    month: 'Mar',
+    city: 'London',
+    temperature: 5.7
+  },
+  {
+    month: 'Apr',
+    city: 'Tokyo',
+    temperature: 14.5
+  },
+  {
+    month: 'Apr',
+    city: 'London',
+    temperature: 8.5
+  },
+  {
+    month: 'May',
+    city: 'Tokyo',
+    temperature: 18.4
+  },
+  {
+    month: 'May',
+    city: 'London',
+    temperature: 11.9
+  },
+  {
+    month: 'Jun',
+    city: 'Tokyo',
+    temperature: 21.5
+  },
+  {
+    month: 'Jun',
+    city: 'London',
+    temperature: 15.2
+  },
+  {
+    month: 'Jul',
+    city: 'Tokyo',
+    temperature: 25.2
+  },
+  {
+    month: 'Jul',
+    city: 'London',
+    temperature: 17
+  },
+  {
+    month: 'Aug',
+    city: 'Tokyo',
+    temperature: 26.5
+  },
+  {
+    month: 'Aug',
+    city: 'London',
+    temperature: 16.6
+  },
+  {
+    month: 'Sep',
+    city: 'Tokyo',
+    temperature: 23.3
+  },
+  {
+    month: 'Sep',
+    city: 'London',
+    temperature: 14.2
+  },
+  {
+    month: 'Oct',
+    city: 'Tokyo',
+    temperature: 18.3
+  },
+  {
+    month: 'Oct',
+    city: 'London',
+    temperature: 10.3
+  },
+  {
+    month: 'Nov',
+    city: 'Tokyo',
+    temperature: 13.9
+  },
+  {
+    month: 'Nov',
+    city: 'London',
+    temperature: 6.6
+  },
+  {
+    month: 'Dec',
+    city: 'Tokyo',
+    temperature: 9.6
+  },
+  {
+    month: 'Dec',
+    city: 'London',
+    temperature: 4.8
+  }
+]
+const cols = {
+  month: {
+    range: [0, 1]
+  }
+}
 
 export default class index extends Component {
   render() {
     return (
       <div style={{ backgroundColor: '#fff' }}>
-        <Tabs defaultActiveKey='1' tabPosition={'top'} style={{ height: 220 }}>
+        <Tabs defaultActiveKey='1' tabPosition={'top'} style={{ height: 550 }}>
           {[...Array(30).keys()].map(i => (
             <TabPane
               tab={
@@ -24,7 +167,59 @@ export default class index extends Component {
               key={i}
               disabled={i === 28}
             >
-              Content of tab {i}
+              {/* scale: 图表的一个比例尺配置 */}
+              <Chart height={400} data={data} scale={cols} autoFit>
+                {/* 图例: position:控制图例的位置 */}
+                <Legend position={'top'} />
+                <Axis name='month' />
+                <Axis
+                  name='temperature'
+                  //  给 temperature 重新命名
+                  label={{
+                    formatter: val => `${val}°C`
+                  }}
+                />
+                <Tooltip
+                  crosshairs={{
+                    type: 'y'
+                  }}
+                >
+                  {(title, items) => {
+                    // 配置了 class="g2-tooltip-list" 则会将模版中的内容渲染进来
+                    // 您也可以根据 items 自行渲染
+                    return (
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>&nbsp;</th>
+                            <th>名称</th>
+                            <th>值</th>
+                          </tr>
+                        </thead>
+                        <tbody class='g2-tooltip-list'></tbody>
+                      </table>
+                    )
+                  }}
+                </Tooltip>
+                <Geom
+                  type='line'
+                  position='month*temperature'
+                  size={2}
+                  color={'city'}
+                  shape={'smooth'}
+                />
+                <Geom
+                  type='point'
+                  position='month*temperature'
+                  size={4}
+                  shape={'circle'}
+                  color={'city'}
+                  // style={{
+                  //   stroke: '#l(0) 0:#ffffff 0.5:#7ec2f3 1:#1890ff',
+                  //   lineWidth: 10
+                  // }}
+                />
+              </Chart>
             </TabPane>
           ))}
         </Tabs>
