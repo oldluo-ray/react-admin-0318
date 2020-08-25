@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Form, Input, Button, Checkbox, Row, Col, Tabs } from 'antd'
+import React, { Component, useState } from 'react'
+import { Form, Input, Button, Checkbox, Row, Col, Tabs, message } from 'antd'
 import {
   UserOutlined,
   LockOutlined,
@@ -14,6 +14,8 @@ import { withRouter } from 'react-router-dom'
 
 import { login } from '@redux/actions/login'
 
+import { reqGetVerifyCode } from '@api/acl/oauth'
+
 import './index.less'
 
 const { TabPane } = Tabs
@@ -23,11 +25,11 @@ const { TabPane } = Tabs
 // value 就是表单项中的值
 // 要求返回一个promise. 如果是成功的promise就校验通过,如果是失败的promise就校验不通过
 const validator = (rule, value) => {
-  // console.log(value)
+  console.log(value)
   return new Promise((resolve, reject) => {
     // 自己去实现表单校验
     // 密码是必填项
-    value = value.trim()
+    value = value && value.trim()
     if (!value) {
       // 表示没有输入密码
       return reject('请输入密码')
@@ -56,6 +58,10 @@ const validator = (rule, value) => {
 function LoginForm(props) {
   // 注意: form要从一个数组中解构出来
   const [form] = Form.useForm()
+
+  // 存储倒计时的值
+  let [downCount, setDownCount] = useState(5)
+  let [isShowBtn, setIsShowBtn] = useState(true)
   const onFinish = ({ username, password }) => {
     props.login(username, password).then(token => {
       // 登录成功
@@ -83,8 +89,25 @@ function LoginForm(props) {
     // 1. 使用Form.useForm() 得到一个form实例对象
     // 2. 将form实例对象和我们写在下面的Form绑定起来 <Form form={form对象}></Form>
     // 3. 调用form.validateFields() 注意:如果函数中不传参数,会触发所有表单项的校验. 如果只触发手机号的表单校验. form.validateFields(['手机号表单项的name属性的值'])
-    form.validateFields(['phone']).then(res => {
-      console.log(res)
+    form.validateFields(['phone']).then(async res => {
+      // await reqGetVerifyCode(res.phone)
+      message.success('验证码获取成功')
+
+      // 倒计时
+      const timeid = setInterval(() => {
+        setDownCount(--downCount)
+        setIsShowBtn(false)
+        if (downCount <= 0) {
+          // 把定时器停掉
+          clearInterval(timeid)
+          // 倒计时时间恢复原来的值
+          // 按钮也要恢复
+          setDownCount(5)
+          setIsShowBtn(true)
+        }
+      }, 1000)
+
+      //
     })
   }
   return (
@@ -167,8 +190,12 @@ function LoginForm(props) {
                 </Form.Item>
               </Col>
               <Col span={7}>
-                <Button className='verify-btn' onClick={getCode}>
-                  获取验证码
+                <Button
+                  className='verify-btn'
+                  onClick={getCode}
+                  disabled={isShowBtn ? false : true}
+                >
+                  {isShowBtn ? '获取验证码' : `${downCount}秒后发送`}
                 </Button>
               </Col>
             </Row>
