@@ -12,7 +12,7 @@ import {
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { login } from '@redux/actions/login'
+import { login, mobilelogin } from '@redux/actions/login'
 
 import { reqGetVerifyCode } from '@api/acl/oauth'
 
@@ -55,6 +55,8 @@ const validator = (rule, value) => {
   })
 }
 
+// 注意: 这行代码,如果写在组件里面,组件重新渲染的时候,这行代码会被重新执行.会影响里面的值
+let tabFlag = 'user' //记录tab选中的是谁
 function LoginForm(props) {
   // 注意: form要从一个数组中解构出来
   const [form] = Form.useForm()
@@ -62,14 +64,36 @@ function LoginForm(props) {
   // 存储倒计时的值
   let [downCount, setDownCount] = useState(5)
   let [isShowBtn, setIsShowBtn] = useState(true)
-  const onFinish = ({ username, password }) => {
-    props.login(username, password).then(token => {
-      // 登录成功
-      // console.log("登陆成功~");
-      // 持久存储token
-      localStorage.setItem('user_token', token)
-      props.history.replace('/')
-    })
+
+  const onFinish = () => {
+    console.log(1111, tabFlag)
+    // 1. 先判断当前是账户密码登录还是手机号登录
+    // 2. 根据判断的 结果, 手动验证对应的表单项
+    // 3. 如果校验通过,根据判断,去调用对应的接口发送请求,实现登录逻辑
+    if (tabFlag === 'user') {
+      form.validateFields(['username', 'password']).then(res => {
+        const { username, password } = res
+        props.login(username, password).then(token => {
+          // 登录成功
+          // console.log("登陆成功~");
+          // 持久存储token
+          localStorage.setItem('user_token', token)
+          props.history.replace('/')
+        })
+      })
+    } else {
+      form.validateFields(['phone', 'verify']).then(res => {
+        const { phone, verify } = res
+        props.mobilelogin(phone, verify).then(token => {
+          // 登录成功
+          // console.log("登陆成功~");
+          // 持久存储token
+          localStorage.setItem('user_token', token)
+          props.history.replace('/')
+        })
+      })
+    }
+
     // .catch(error => {
     //   notification.error({
     //     message: "登录失败",
@@ -90,12 +114,14 @@ function LoginForm(props) {
     // 2. 将form实例对象和我们写在下面的Form绑定起来 <Form form={form对象}></Form>
     // 3. 调用form.validateFields() 注意:如果函数中不传参数,会触发所有表单项的校验. 如果只触发手机号的表单校验. form.validateFields(['手机号表单项的name属性的值'])
     form.validateFields(['phone']).then(async res => {
-      // await reqGetVerifyCode(res.phone)
+      await reqGetVerifyCode(res.phone)
       message.success('验证码获取成功')
 
       // 倒计时
       const timeid = setInterval(() => {
         setDownCount(--downCount)
+        console.log(downCount)
+        // setDownCount(downCount - 1)
         setIsShowBtn(false)
         if (downCount <= 0) {
           // 把定时器停掉
@@ -110,6 +136,12 @@ function LoginForm(props) {
       //
     })
   }
+
+  // 监听tab切换的事件处理函数
+  const handleTabChange = key => {
+    console.log(key)
+    tabFlag = key
+  }
   return (
     <>
       <Form
@@ -118,11 +150,13 @@ function LoginForm(props) {
         name='normal_login'
         className='login-form'
         initialValues={{ remember: true }}
-        onFinish={onFinish}
+        // onFinish={onFinish}
       >
         <Tabs
           defaultActiveKey='user'
           tabBarStyle={{ display: 'flex', justifyContent: 'center' }}
+          // 监听tab切换
+          onChange={handleTabChange}
         >
           <TabPane tab='账户密码登陆' key='user'>
             <Form.Item
@@ -182,7 +216,19 @@ function LoginForm(props) {
 
             <Row justify='space-between'>
               <Col span={16}>
-                <Form.Item name='verify'>
+                <Form.Item
+                  name='verify'
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入验证码'
+                    },
+                    {
+                      pattern: /^[\d]{6}$/,
+                      message: '只能是6位数字'
+                    }
+                  ]}
+                >
                   <Input
                     prefix={<MailOutlined className='form-icon' />}
                     placeholder='验证码'
@@ -214,8 +260,10 @@ function LoginForm(props) {
         <Form.Item>
           <Button
             type='primary'
-            htmlType='submit'
+            // htmlType='submit'
             className='login-form-button'
+            // 注册点击事件
+            onClick={onFinish}
           >
             登陆
           </Button>
@@ -243,6 +291,6 @@ function LoginForm(props) {
 export default withRouter(
   connect(
     null,
-    { login }
+    { login, mobilelogin }
   )(LoginForm)
 )
