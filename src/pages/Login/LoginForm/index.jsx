@@ -142,6 +142,14 @@ function LoginForm(props) {
     console.log(key)
     tabFlag = key
   }
+
+  // 第三方授权登录(git)事件处理函数
+  const oauthLogin = () => {
+    // 浏览器给服务器发送请求,获取code
+    // location.href赋值为一个url时, 会直接根据这个url发送请求. 并且只要是地址栏发的请求,肯定是get请求
+    window.location.href =
+      'https://github.com/login/oauth/authorize?client_id=5453f1088d7dc1cf4bd1'
+  }
   return (
     <>
       <Form
@@ -273,7 +281,7 @@ function LoginForm(props) {
             <Col span={16}>
               <span>
                 其他登陆方式
-                <GithubOutlined className='login-icon' />
+                <GithubOutlined className='login-icon' onClick={oauthLogin} />
                 <WechatOutlined className='login-icon' />
                 <QqOutlined className='login-icon' />
               </span>
