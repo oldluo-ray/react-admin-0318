@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { loginSuccessSync } from '@redux/actions/login'
+console.log('oauth文件执行了')
 
 // 这个是第三方授权登录成功之后会执行的组件, 在这个组件中,要做的事情就是
 // 获取token,并且存储到本地缓存和redux里面

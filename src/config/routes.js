@@ -1,6 +1,32 @@
-import Login from '@pages/Login'
-import NotFound from '@pages/404'
-import Oauth from '@pages/Login/components/Oauth'
+// 1. 分包
+// 注意: react脚手架中使用webpack. webpack会将所有文件打包成一个js文件. 这样会导致用户在请求页面的时候,响应时间比较长
+// 所以,开发时要优化用户体验:
+// 实现: 利用分包. webpack打包文件之后,就不是打包成一个js文件.而是打包成多个.这样会同时发送多个请求,每一个请求的文件体积较小.所以响应速度快
+// react分包的方式: import('文件路径')
+
+// 2. 懒加载
+// import Login from '@pages/Login' 这种导入方式,会导致login文件中的内容上来先执行不遍
+// 为了优化代码,提高用户体验.希望让组件,在使用的时候,才加载代码
+// 实现:
+// 1. 导入react
+// 2. const 组件名 = React.lazy(() => import('组件路径'))
+// 3. 在使用懒加载导入的组件的时候,一定要使用Suspense组件包裹懒加载的组件
+
+/* 
+	注意:fallback的组件是在加载 懒加载组件的时候执行
+	<Suspense fallback={正在加载的组件}>
+  <懒加载的组件 />
+</Suspense> */
+
+import React from 'react'
+// import Login from '@pages/Login'
+// import NotFound from '@pages/404'
+// import Oauth from '@pages/Login/components/Oauth'
+
+// 懒加载的方式
+const Login = React.lazy(() => import('@pages/Login'))
+const NotFound = React.lazy(() => import('@pages/404'))
+const Oauth = React.lazy(() => import('@pages/Login/components/Oauth'))
 
 //#region
 /* export const asyncRoutes = [

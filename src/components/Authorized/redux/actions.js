@@ -1,38 +1,34 @@
-import { getMenu, getInfo } from "@api/acl/login";
+import { getMenu, getInfo } from '@api/acl/login'
+import { GET_USER_INFO, GET_USER_MENU } from './constants'
 
-import { UPDATE_USER, UPDATE_PERMISSION_LIST, RESET_USER } from "./constants";
-/**
- * 获取权限菜单
- */
-const getAccessRoutesSync = (menu) => ({
-  type: UPDATE_PERMISSION_LIST,
-  data: menu,
-});
+// 获取用户信息的action
+function getUserInfoSync(data) {
+  return {
+    type: GET_USER_INFO,
+    data
+  }
+}
 
-export const getAccessRoutes = () => {
-  return (dispatch) => {
-    return getMenu().then((response) => {
-      dispatch(getAccessRoutesSync(response ? response.permissionList : {}));
-    });
-  };
-};
+export function getUserInfo() {
+  return dispatch => {
+    return getInfo().then(res => {
+      dispatch(getUserInfoSync(res))
+    })
+  }
+}
 
-/**
- * 获取用户信息（包含权限）
- */
-const getUserInfoSync = (info) => ({
-  type: UPDATE_USER,
-  data: info,
-});
+// 获取用户信息的action
+function getUserMenuSync(data) {
+  return {
+    type: GET_USER_MENU,
+    data
+  }
+}
 
-export const getUserInfo = () => {
-  return (dispatch) => {
-    return getInfo().then((response) => {
-      dispatch(getUserInfoSync(response));
-    });
-  };
-};
-
-export const resetUser = () => ({
-  type: RESET_USER,
-});
+export function getUserMenu() {
+  return dispatch => {
+    return getMenu().then(res => {
+      dispatch(getUserMenuSync(res))
+    })
+  }
+}

@@ -1,4 +1,5 @@
-import Authorized from "./Authorized";
-import AuthorizedRouter from "./AuthorizedRouter";
+import Authorized from './Authorized'
+// import AuthorizedRouter from "./AuthorizedRouter";
 
-export { Authorized, AuthorizedRouter };
+export { Authorized }
+// export { Authorized, AuthorizedRouter };
