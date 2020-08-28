@@ -19,13 +19,16 @@ import { connect } from 'react-redux'
 import SearchForm from './SearchForm'
 import { getLessonList, delChapterList, delLessonList } from './redux'
 
+import { filterPermissions } from '@utils/tools'
+
 import './index.less'
 
 dayjs.extend(relativeTime)
 
 @connect(
   state => ({
-    chapterList: state.chapterList.chapterList
+    chapterList: state.chapterList.chapterList,
+    permissionValueList: state.user.permissionValueList
   }),
   { getLessonList, delChapterList, delLessonList }
 )
@@ -166,6 +169,17 @@ class Chapter extends Component {
   render() {
     const { previewVisible, previewImage, selectedRowKeys } = this.state
 
+    const permissionValueList = this.props.permissionValueList
+
+    console.log(permissionValueList)
+
+    // 测试filterPermissions函数
+    const res = filterPermissions(permissionValueList, 'user')
+    console.log(res)
+
+    // 给添加课时按钮,设置为权限按钮.如果permissionValueList里面有chapter.addlesson就展示新增课时,否则不展示
+    const index = permissionValueList.indexOf('chapter.addlesson')
+
     const columns = [
       {
         title: '章节名称',
@@ -201,11 +215,13 @@ class Chapter extends Component {
         render: data => {
           return (
             <div>
-              <Tooltip title='新增课时'>
-                <Button type='primary' onClick={this.handleGoAddLesson(data)}>
-                  <PlusOutlined />
-                </Button>
-              </Tooltip>
+              {index > -1 && (
+                <Tooltip title='新增课时'>
+                  <Button type='primary' onClick={this.handleGoAddLesson(data)}>
+                    <PlusOutlined />
+                  </Button>
+                </Tooltip>
+              )}
               <Tooltip title='更新章节'>
                 <Button type='primary' style={{ margin: '0 10px' }}>
                   <FormOutlined />
