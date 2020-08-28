@@ -196,7 +196,7 @@ export default class index extends Component {
                             <th>值</th>
                           </tr>
                         </thead>
-                        <tbody class='g2-tooltip-list'></tbody>
+                        <tbody className='g2-tooltip-list'></tbody>
                       </table>
                     )
                   }}
