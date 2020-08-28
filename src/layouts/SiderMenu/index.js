@@ -12,6 +12,7 @@ import {
   MenuFoldOutlined
 } from '@ant-design/icons'
 
+import { Link, withRouter } from 'react-router-dom'
 //导入所有字体图标对象
 import icons from '@conf/icons'
 
@@ -20,6 +21,7 @@ import { defaultRoutes } from '@conf/routes'
 
 const { SubMenu } = Menu
 
+@withRouter
 @connect(state => ({ permissionList: state.user.permissionList }))
 class SiderMenu extends Component {
   // 作用: 根据数据渲染menu
@@ -40,7 +42,12 @@ class SiderMenu extends Component {
           <SubMenu key={route.path} icon={<Icon />} title={route.name}>
             {route.children.map(SecItem => {
               if (SecItem.hidden) return null
-              return <Menu.Item key={SecItem.path}>{SecItem.name}</Menu.Item>
+              return (
+                <Menu.Item key={route.path + SecItem.path}>
+                  {/* 注意: 修改浏览器地址栏的地址需要将一级和二级的path拼接起来 */}
+                  <Link to={route.path + SecItem.path}>{SecItem.name}</Link>
+                </Menu.Item>
+              )
             })}
           </SubMenu>
         )
@@ -48,16 +55,30 @@ class SiderMenu extends Component {
         // 只有一级
         return (
           <Menu.Item key={route.path} icon={<Icon />}>
-            {route.name}
+            {route.path === '/' ? <Link to='/'>{route.name}</Link> : route.name}
           </Menu.Item>
         )
       }
     })
   }
   render() {
+    // console.log(this.props.location)
+    const pathname = this.props.location.pathname
+    // /edu/subject/list
+    // 要从字符串中截取一部分
+    // 利用正则提取获取路径第一部分
+    const matchArr = pathname.match(/[/][a-z]+/)
+    const openKey = matchArr && matchArr[0]
+
     return (
       <div>
-        <Menu theme='dark' defaultSelectedKeys={['1']} mode='inline'>
+        <Menu
+          theme='dark'
+          defaultSelectedKeys={[pathname]}
+          // 设置菜单是否展开的属性. 值应该是subMenu的是key的值
+          defaultOpenKeys={[openKey]}
+          mode='inline'
+        >
           {this.renderMenu(defaultRoutes)}
           {this.renderMenu(this.props.permissionList)}
           {/* 如果Menu.Item直接被Menu包裹. 那么表示只有一级  */}
