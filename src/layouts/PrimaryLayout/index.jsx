@@ -38,22 +38,32 @@ class PrimaryLayout extends Component {
 
   // 将permissionList数据,转成Route组件的函数
   // 将defaultRoutes转成Route
-  renderRoute = routes => {
+  renderRoute = (routes, path) => {
     // 遍历routes.遍历过程中,判断component属性是否有值,如果有值,就渲染Route.如果没有就不渲染
     return routes.map(item => {
+      // 先判断item.component有没有值,如果有,就渲染route
+      // 比如传进来的首页数据有值,就渲染了一个route. permissionList数据component属性没有值,
+      // 就不进来
       if (item.component) {
         // 获取对应的组件
         // 注意: 由于asyncComps中导入组件的时候,外面包装了一层函数,所以通过components对象的指定属性拿到的不是真正的组件,而是一个函数.只要调用这个函数,才能拿到组件
         const MyComponent = components[item.component]()
         //返回route
         return (
+          // 注意:如果这里执行的时候,渲染的是children里面的数据,那么path的路径就应该是一级的path+二级的path
           <Route
-            path={item.path}
+            path={path ? path + item.path : item.path}
             component={MyComponent}
             exact
             key={item.path}
           ></Route>
         )
+      }
+
+      // 判断item身上有没有children属性,如果有并且又长度,就遍历children
+      if (item.children && item.children.length) {
+        //
+        return this.renderRoute(item.children, item.path)
       }
     })
   }
@@ -94,6 +104,8 @@ class PrimaryLayout extends Component {
       })
 
     console.log(firstName, SecName)
+
+    console.log(this.renderRoute(this.props.user.permissionList))
 
     return (
       <Layout className='layout'>
@@ -148,10 +160,12 @@ class PrimaryLayout extends Component {
             </div>
 
             {/* 注意: 具体点击左侧导航,要展示的组件,应该写在这个位置上.并且这里应该是一堆Route组件 */}
-            {/* <div className='layout-content'>Bill is a cat.</div> */}
-            <Suspense fallback={<div>正在加载...</div>}>
-              {this.renderRoute(defaultRoutes)}
-            </Suspense>
+            <div className='layout-content'>
+              <Suspense fallback={<div>正在加载...</div>}>
+                {this.renderRoute(defaultRoutes)}
+                {this.renderRoute(this.props.user.permissionList)}
+              </Suspense>
+            </div>
           </Content>
           <Footer style={{ textAlign: 'center' }}>
             Ant Design ©2018 Created by Ant UED
